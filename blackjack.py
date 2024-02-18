@@ -9,7 +9,8 @@ def main():
 
     currentDeck = deck.makeDecks(numberOfDecks)
     players = deal(currentDeck, numberOfPlayers)
-    
+    for play in players:
+        play.printHand()
 
 def deal(deck, numberOfPlayers):
     players = []
