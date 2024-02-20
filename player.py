@@ -3,6 +3,7 @@ import random
 class Player(object):
     hand = []
     handValue = 0
+    isOut = False
     printTop = '_______'
     printBottom = '|_____|'
     printBlank = '|     |'
@@ -10,13 +11,41 @@ class Player(object):
 
     def printHand(self):
         print(self.name + ': ')
-        print(self.printTop + self.printSpace + self.printTop)
-        print('|  ' + self.hand[0].displaySuit + '  |' + self.printSpace + '|  ' + self.hand[1].displaySuit + '  |')
-        print('|' + self.hand[0].displayValue + '|' + self.printSpace + '|' + self.hand[1].displayValue + '|')
-        print(self.printBlank + self.printSpace + self.printBlank)
-        print(self.printBottom + self.printSpace + self.printBottom)
+        cardTop = ''
+        cardSuit = ''
+        cardValue = ''
+        cardBlankLine = ''
+        cardBottom = ''
+
+        for card in self.hand:
+            cardTop = cardTop + self.printTop + self.printSpace
+            cardSuit = cardSuit + '|  ' + card.displaySuit + '  |' + self.printSpace
+            cardValue = cardValue + '|' + card.displayValue + '|' + self.printSpace
+            cardBlankLine = cardBlankLine + self.printBlank + self.printSpace
+            cardBottom = cardBottom + self.printBottom + self.printSpace
+        
+        print(cardTop)
+        print(cardSuit)
+        print(cardValue)
+        print(cardBlankLine)
+        print(cardBottom)
         print('Points: ' + str(self.handValue))
         print()
+
+    def calculateHandValue(self):
+        handValue = 0
+        for card in self.hand:
+            handValue = handValue + card.points
+        if handValue > 21:
+            for card in self.hand:
+                if card.points == 11:
+                    card.points = 1
+                    handValue = handValue - 10
+        self.handValue = handValue
+
+    def drawCard(self, card):
+        self.hand.append(card)
+        self.calculateHandValue()
 
     def __init__(self, cards, number, handValue):     
         self.hand = cards
@@ -29,16 +58,12 @@ class Player(object):
 def makePlayer(deck, number):
     random.seed(a = None)
     cards = []
-    firstCardIndex = random.randrange(0, len(deck.cardsLeft))
-    firstCard = deck.cardsLeft[firstCardIndex]
-    del deck.cardsLeft[firstCardIndex]
-    cards.append(firstCard)
-
-    secondCardIndex = random.randrange(0, len(deck.cardsLeft))
-    secondCard = deck.cardsLeft[secondCardIndex]
-    del deck.cardsLeft[secondCardIndex]
-    cards.append(secondCard)
-
-    handValue = firstCard.points + secondCard.points
+    handValue = 0
+    for i in range(2):
+        cardIndex = random.randrange(0, len(deck.cardsLeft))
+        newCard = deck.cardsLeft[cardIndex]
+        del deck.cardsLeft[cardIndex]
+        cards.append(newCard)
+        handValue = handValue + newCard.points
 
     return Player(cards, number, handValue)
