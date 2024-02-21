@@ -8,11 +8,13 @@ def main():
     numberOfDecks = int(input())
     print("How many players?")
     numberOfPlayers = int(input())
+    continuePlay = True
 
-    currentDeck = deck.makeDecks(numberOfDecks)
-    players = deal(currentDeck, numberOfPlayers)
-    
-    gameplay(currentDeck, players)
+    while continuePlay:
+        currentDeck = deck.makeDecks(numberOfDecks)
+        players = deal(currentDeck, numberOfPlayers)
+        gameplay(currentDeck, players)
+        continuePlay = playAgain()
 
 def deal(deck, numberOfPlayers):
     players = []
@@ -115,6 +117,19 @@ def isAnyActivePlayers(players):
         return False
     else:
         return True
+
+def playAgain():
+    validInput = False
+    inputValue = ''
+    while not validInput:
+        print('Play again? [Y]es or [N]o')
+        inputValue = input().lower()
+        if inputValue == 'y' or inputValue == 'n':
+            validInput = True
+    if inputValue == 'y':
+        return True
+    else:
+        return False
 
 if __name__ == "__main__":
     main()
