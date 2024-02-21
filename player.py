@@ -9,27 +9,52 @@ class Player(object):
     printBlank = '|     |'
     printSpace = '   '
 
-    def printHand(self):
+    def printHand(self, isFirstDeal):
         print(self.name + ': ')
+
+        if self.name == 'Dealer' and isFirstDeal:
+            self.printDealerHand()
+        else:
+            cardTop = ''
+            cardSuit = ''
+            cardValue = ''
+            cardBlankLine = ''
+            cardBottom = ''
+
+            for card in self.hand:
+                cardTop = cardTop + self.printTop + self.printSpace
+                cardSuit = cardSuit + '|  ' + card.displaySuit + '  |' + self.printSpace
+                cardValue = cardValue + '|' + card.displayValue + '|' + self.printSpace
+                cardBlankLine = cardBlankLine + self.printBlank + self.printSpace
+                cardBottom = cardBottom + self.printBottom + self.printSpace
+        
+            print(cardTop)
+            print(cardSuit)
+            print(cardValue)
+            print(cardBlankLine)
+            print(cardBottom)
+            print('Points: ' + str(self.handValue))
+            print()
+
+    def printDealerHand(self):
         cardTop = ''
         cardSuit = ''
         cardValue = ''
         cardBlankLine = ''
         cardBottom = ''
 
-        for card in self.hand:
-            cardTop = cardTop + self.printTop + self.printSpace
-            cardSuit = cardSuit + '|  ' + card.displaySuit + '  |' + self.printSpace
-            cardValue = cardValue + '|' + card.displayValue + '|' + self.printSpace
-            cardBlankLine = cardBlankLine + self.printBlank + self.printSpace
-            cardBottom = cardBottom + self.printBottom + self.printSpace
+        cardTop = self.printTop + self.printSpace + self.printTop
+        cardSuit = '|  ' + self.hand[0].displaySuit + '  |' + self.printSpace + self.printBlank
+        cardValue = '|' + self.hand[0].displayValue + '|' + self.printSpace + self.printBlank
+        cardBlankLine = self.printBlank + self.printSpace + self.printBlank
+        cardBottom = self.printBottom + self.printSpace + self.printBottom
         
         print(cardTop)
         print(cardSuit)
         print(cardValue)
         print(cardBlankLine)
         print(cardBottom)
-        print('Points: ' + str(self.handValue))
+        print('Points: ' + str(self.hand[0].points))
         print()
 
     def calculateHandValue(self):

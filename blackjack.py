@@ -1,6 +1,7 @@
 import deck
 import player
 import random
+import time
 
 def main():
     print("How many decks?")
@@ -21,25 +22,73 @@ def deal(deck, numberOfPlayers):
 
 def gameplay(deck, players):
     for play in players:
-        play.printHand()
+        play.printHand(True)
+        time.sleep(1)
     anyActivePlayers = True
     while anyActivePlayers:
         for activePlayer in players:
             if activePlayer.name != 'Dealer':
                 canContinue = True
-                while canContinue and getAction(activePlayer.name):
+                while canContinue and getAction(activePlayer):
                     hit(deck, activePlayer)
-                    activePlayer.printHand()
-                    if activePlayer.handValue >= 21:
+                    activePlayer.printHand(True)
+                    time.sleep(1)
+                    if activePlayer.handValue > 21:
+                        canContinue = False
+                        print(activePlayer.name + ' busts')
+                        time.sleep(1)
+                    elif activePlayer.handValue == 21:
                         canContinue = False
                 stand(activePlayer)
         anyActivePlayers = isAnyActivePlayers(players)
+    dealerTurn(players[0], deck)
+    scoring(players)
 
-def getAction(playerName):
+def scoring(players):
+    endValue = ''
+    dealerHand = players[0].handValue
+    if dealerHand <= 21:
+        for play in players:
+            if play.name != 'Dealer': 
+                if play.handValue > 21:
+                    endValue = ' loses'
+                elif play.handValue > players[0].handValue:
+                    endValue = ' wins'
+                elif play.handValue == players[0].handValue:
+                    endValue = ': push'
+                else:
+                    endValue = ' loses'
+                print(play.name + endValue)
+                time.sleep(1)
+    else:
+        for play in players:
+            if play.name != 'Dealer':
+                if play.handValue > 21:
+                    endValue = ' loses'
+                else:
+                    endValue = ' wins'
+                print(play.name + endValue)
+                time.sleep(1)
+
+def dealerTurn(dealer, currentDeck):
+    dealer.printHand(False)
+    canContinue = dealer.handValue < 17
+    while canContinue:
+        hit(currentDeck, dealer)
+        dealer.printHand(False)
+        time.sleep(1)
+        if dealer.handValue >= 17:
+            canContinue = False
+        if dealer.handValue > 21:
+            print(dealer.name + ' busts')
+            time.sleep(1)
+
+def getAction(activePlayer):
     validInput = False
     inputValue = ''
     while not validInput:
-        print(playerName + ': [H]it or [S]tand')
+        activePlayer.printHand(False)
+        print(activePlayer.name + ': [H]it or [S]tand')
         inputValue = input().lower()
         if inputValue == 'h' or inputValue == 's':
             validInput = True
