@@ -112,6 +112,7 @@ def calculateChips(currentPlayer, didWin, didPush):
 
 def dealerTurn(dealer, currentDeck):
     dealer.printHand(False)
+    time.sleep(1)
     canContinue = dealer.handValue < 17
     while canContinue:
         hit(currentDeck, dealer)
@@ -149,14 +150,19 @@ def stand(currentPlayer):
 def bet(currentPlayer):
     validInput = False
     inputValue = ''
+    inputFloat = 0
     while not validInput:
         print(currentPlayer.name + ': What will you bet? You have ' + str(currentPlayer.currentChips) + ' chips.')
-        inputValue = float(input())
-        if inputValue > 0 and inputValue <= currentPlayer.currentChips:
-            validInput = True
-    currentPlayer.currentBet = inputValue
-    currentPlayer.totalEarnings -= inputValue
-    currentPlayer.currentChips -= inputValue
+        inputValue = input()
+        try:
+            inputFloat = float(inputValue)
+            if inputFloat > 0 and inputFloat <= currentPlayer.currentChips:
+                validInput = True
+        except ValueError:
+            validInput = False
+    currentPlayer.currentBet = inputFloat
+    currentPlayer.totalEarnings -= inputFloat
+    currentPlayer.currentChips -= inputFloat
 
 def isAnyActivePlayers(players):
     outPlayerCount = 1
