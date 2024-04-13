@@ -4,6 +4,9 @@ class Player(object):
     hand = []
     handValue = 0
     isOut = False
+    totalEarnings = 0
+    currentChips = 500
+    currentBet = 0
     printTop = '_______'
     printBottom = '|_____|'
     printBlank = '|     |'
@@ -66,11 +69,26 @@ class Player(object):
                 if card.points == 11:
                     card.points = 1
                     handValue = handValue - 10
+                    break
         self.handValue = handValue
 
     def drawCard(self, card):
         self.hand.append(card)
         self.calculateHandValue()
+
+    def newHand(self, deck):
+        random.seed(a = None)
+        cards = []
+        handValue = 0
+        for i in range(2):
+            cardIndex = random.randrange(0, len(deck.cardsLeft))
+            newCard = deck.cardsLeft[cardIndex]
+            del deck.cardsLeft[cardIndex]
+            cards.append(newCard)
+            handValue = handValue + newCard.points
+
+        self.hand = cards
+        self.handValue = handValue
 
     def __init__(self, cards, number, handValue):     
         self.hand = cards

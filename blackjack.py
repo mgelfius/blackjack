@@ -8,13 +8,29 @@ def main():
     numberOfDecks = int(input())
     print("How many players?")
     numberOfPlayers = int(input())
-    continuePlay = True
+    
+    currentDeck = deck.makeDecks(numberOfDecks)
+    players = deal(currentDeck, numberOfPlayers)
+    gameplay(currentDeck, players)
+    continuePlay = yesNoQuestion("Play again?")
 
     while continuePlay:
         currentDeck = deck.makeDecks(numberOfDecks)
-        players = deal(currentDeck, numberOfPlayers)
+        for play in players:
+            play.newHand(currentDeck)
         gameplay(currentDeck, players)
-        continuePlay = playAgain()
+        for play in players:
+            if play.name != 'Dealer':
+                if play.currentChips < 10:
+                    moreChips = yesNoQuestion("Get 500 more chips? You are at " + str(play.currentChips) + ".")
+                    if moreChips:
+                        play.currentChips += 500
+                        play.totalEarnings -= 500
+        continuePlay = yesNoQuestion("Play again?")
+    for play in players:
+            if play.name != 'Dealer':
+                print(play.name + ": Total Earnings - " + str(play.totalEarnings))
+                time.sleep(1)
 
 def deal(deck, numberOfPlayers):
     players = []
@@ -23,6 +39,10 @@ def deal(deck, numberOfPlayers):
     return players
 
 def gameplay(deck, players):
+    for play in players:
+        if play.name != 'Dealer':
+            bet(play)
+            time.sleep(1)
     for play in players:
         play.printHand(True)
         time.sleep(1)
@@ -54,12 +74,16 @@ def scoring(players):
             if play.name != 'Dealer': 
                 if play.handValue > 21:
                     endValue = ' loses'
+                    calculateChips(play, False, False)
                 elif play.handValue > players[0].handValue:
                     endValue = ' wins'
+                    calculateChips(play, True, False)
                 elif play.handValue == players[0].handValue:
                     endValue = ': push'
+                    calculateChips(play, False, True)
                 else:
                     endValue = ' loses'
+                    calculateChips(play, False, False)
                 print(play.name + endValue)
                 time.sleep(1)
     else:
@@ -67,10 +91,24 @@ def scoring(players):
             if play.name != 'Dealer':
                 if play.handValue > 21:
                     endValue = ' loses'
+                    calculateChips(play, False, False)
                 else:
                     endValue = ' wins'
+                    calculateChips(play, True, False)
                 print(play.name + endValue)
                 time.sleep(1)
+
+def calculateChips(currentPlayer, didWin, didPush):
+    winnings = 0
+
+    if didWin:
+        winnings = currentPlayer.currentBet * 1.5
+    elif didPush:
+        winnings = currentPlayer.currentBet
+        
+    currentPlayer.totalEarnings += winnings
+    currentPlayer.currentChips += winnings
+    currentPlayer.currentBet = 0
 
 def dealerTurn(dealer, currentDeck):
     dealer.printHand(False)
@@ -108,6 +146,18 @@ def hit(deck, currentPlayer):
 def stand(currentPlayer):
     currentPlayer.isOut = True
 
+def bet(currentPlayer):
+    validInput = False
+    inputValue = ''
+    while not validInput:
+        print(currentPlayer.name + ': What will you bet? You have ' + str(currentPlayer.currentChips) + ' chips.')
+        inputValue = float(input())
+        if inputValue > 0 and inputValue <= currentPlayer.currentChips:
+            validInput = True
+    currentPlayer.currentBet = inputValue
+    currentPlayer.totalEarnings -= inputValue
+    currentPlayer.currentChips -= inputValue
+
 def isAnyActivePlayers(players):
     outPlayerCount = 1
     for play in players:
@@ -118,11 +168,11 @@ def isAnyActivePlayers(players):
     else:
         return True
 
-def playAgain():
+def yesNoQuestion(questionStr):
     validInput = False
     inputValue = ''
     while not validInput:
-        print('Play again? [Y]es or [N]o')
+        print(questionStr + ' [Y]es or [N]o')
         inputValue = input().lower()
         if inputValue == 'y' or inputValue == 'n':
             validInput = True
